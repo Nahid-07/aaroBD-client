@@ -1,18 +1,24 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ProductCard from "../../components/products/ProductCard";
-import {fetchProducts} from "../../features/products/ProductSlice"
+import { fetchProducts } from "../../features/products/ProductSlice";
 
 const ProductGrid = () => {
   const dispatch = useDispatch();
-  const { items: products, loading, error } = useSelector((state) => state.products);
+  const {
+    items: products,
+    loading,
+    error,
+  } = useSelector((state) => state.products);
 
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
 
   if (loading) {
-    return <div className="text-center mt-10 text-gray-600">Loading products...</div>;
+    return (
+      <div className="text-center mt-10 text-gray-600">Loading products...</div>
+    );
   }
 
   if (error) {
@@ -32,7 +38,9 @@ const ProductGrid = () => {
             <ProductCard key={product._id} product={product} />
           ))
         ) : (
-          <p className="col-span-full text-center text-gray-500">No products found.</p>
+          <p className="col-span-full text-center text-gray-500">
+            No products found.
+          </p>
         )}
       </div>
     </div>

@@ -5,6 +5,24 @@ import { logout } from "../features/auth/authSlice";
 import { Link } from "react-router-dom";
 
 const Navbar = () => {
+  const menuItems = [
+    {
+      menu : "Home",
+      path: "/"
+    },
+    {
+      menu : "Shop",
+      path: "/shop"
+    },
+    {
+      menu : "About",
+      path: "/about"
+    },
+    {
+      menu : "Contact",
+      path: "/contact"
+    },
+  ]
   const [menuOpen, setMenuOpen] = useState(false);
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
@@ -29,13 +47,13 @@ const Navbar = () => {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex space-x-8">
-            {["Home", "Shop", "About", "Contact"].map((item) => (
+            {menuItems.map((item,i) => (
               <Link
-                key={item}
-                to={`/${item.toLowerCase()}`}
+                key={i}
+                to={item.path}
                 className="text-white font-medium hover:text-yellow-300 transition"
               >
-                {item}
+                {item.menu}
               </Link>
             ))}
           </div>
@@ -91,14 +109,14 @@ const Navbar = () => {
       {/* Mobile Menu */}
       {menuOpen && (
         <div className="md:hidden bg-indigo-700 animate-slide-down">
-          {["Home", "Shop", "About", "Contact"].map((item) => (
+          {menuItems.map((item, i) => (
             <Link
-              key={item}
-              to={`/${item.toLowerCase()}`}
+              key={i}
+              to={`/${item.path}`}
               onClick={() => setMenuOpen(false)}
               className="block px-4 py-2 text-white hover:bg-indigo-600 transition"
             >
-              {item}
+              {item.menu}
             </Link>
           ))}
 
