@@ -7,25 +7,26 @@ import { Link } from "react-router-dom";
 const Navbar = () => {
   const menuItems = [
     {
-      menu : "Home",
-      path: "/"
+      menu: "Home",
+      path: "/",
     },
     {
-      menu : "Shop",
-      path: "/shop"
+      menu: "Shop",
+      path: "/shop",
     },
     {
-      menu : "About",
-      path: "/about"
+      menu: "About",
+      path: "/about",
     },
     {
-      menu : "Contact",
-      path: "/contact"
+      menu: "Contact",
+      path: "/contact",
     },
-  ]
+  ];
   const [menuOpen, setMenuOpen] = useState(false);
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
+  const { totalQuantity } = useSelector((state) => state.cart);
 
   const handleLogOut = () => {
     dispatch(logout());
@@ -47,7 +48,7 @@ const Navbar = () => {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex space-x-8">
-            {menuItems.map((item,i) => (
+            {menuItems.map((item, i) => (
               <Link
                 key={i}
                 to={item.path}
@@ -61,14 +62,13 @@ const Navbar = () => {
           {/* Icons / Auth */}
           <div className="flex items-center space-x-4">
             {/* Cart Icon */}
-            <Link
-              to="/cart"
-              className="relative text-white hover:scale-110 transition-transform"
-            >
+            <Link to="/cart" className="relative text-white">
               <ShoppingBag size={24} />
-              <span className="absolute -top-2 -right-2 bg-yellow-400 text-xs font-bold text-gray-900 rounded-full px-1">
-                2
-              </span>
+              {totalQuantity > 0 && (
+                <span className="absolute -top-2 -right-2 bg-yellow-400 text-xs font-bold text-gray-900 rounded-full px-1">
+                  {totalQuantity}
+                </span>
+              )}
             </Link>
 
             {/* User / Auth Section */}

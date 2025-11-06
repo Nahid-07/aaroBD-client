@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSingleProduct } from "../features/products/ProductSlice";
 import { ShoppingCart, CreditCard } from "lucide-react";
+import { addToCart } from "../features/cart/cartSlice";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -36,6 +37,9 @@ const ProductDetails = () => {
     // Later: Navigate to checkout page or payment flow
     navigate("/checkout", { state: { product: singleProduct } });
   };
+  const handleAddToCart = () => {
+    dispatch(addToCart(singleProduct));
+  };
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 grid md:grid-cols-2 gap-10">
@@ -66,7 +70,10 @@ const ProductDetails = () => {
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 mt-6">
-          <button className="flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-xl shadow transition w-full sm:w-1/2">
+          <button
+            onClick={handleAddToCart}
+            className="flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-xl shadow transition w-full sm:w-1/2"
+          >
             <ShoppingCart size={20} className="mr-2" /> Add to Cart
           </button>
 
