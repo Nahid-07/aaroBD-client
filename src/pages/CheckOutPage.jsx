@@ -1,14 +1,22 @@
 import { useSelector, useDispatch } from "react-redux";
 import { clearCart } from "../features/cart/cartSlice";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
+import axiosClient from "../api/axiosClient";
+import { clearDirectBuyItem } from "../features/checkout/checkoutSlice";
 
 const CheckoutPage = () => {
-  const { cartItems, totalAmount } = useSelector((state) => state.cart);
-  const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const { cartItems, totalAmount } = useSelector((state) => state.cart);
+  const { user } = useSelector((state) => state.auth);
+  const { directBuyItem } = useSelector((state) => state.checkout);
+
+  const itemsToCheckout = directBuyItem ? [directBuyItem] : cartItems;
+  const total = directBuyItem
+    ? directBuyItem.price * directBuyItem.quantity
+    : totalAmount;
 
   const [shippingInfo, setShippingInfo] = useState({
     name: user?.name || "",
@@ -18,36 +26,59 @@ const CheckoutPage = () => {
     paymentMethod: "cod",
   });
 
+  useEffect(() => {
+    if (!user) navigate("/login", { state: { redirectTo: "/checkout" } });
+  }, [user, navigate]);
+
   const handleChange = (e) => {
     setShippingInfo({ ...shippingInfo, [e.target.name]: e.target.value });
   };
 
   const handlePlaceOrder = async () => {
     try {
+      if (!itemsToCheckout || itemsToCheckout.length === 0) {
+        alert("No items to checkout!");
+        return;
+      }
+
       const orderData = {
         user: user._id,
-        items: cartItems.map((item) => ({
+        items: itemsToCheckout.map((item) => ({
           product: item._id,
           quantity: item.quantity,
         })),
-        totalPrice: totalAmount,
+        totalPrice: total,
         shippingInfo,
       };
 
-      const res = await axios.post("/api/orders", orderData, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
+      const res = await axiosClient.post("/orders", orderData, {
+        headers: { Authorization: `Bearer ${user.token}` },
       });
 
       if (res.status === 201) {
         dispatch(clearCart());
+        dispatch(clearDirectBuyItem());
         navigate("/order-success");
       }
     } catch (error) {
-      console.error("Order failed", error.response?.data || error.message);
+      console.error("Order failed:", error.response?.data || error.message);
+      alert("Something went wrong while placing your order.");
     }
   };
+
+  if (!itemsToCheckout || itemsToCheckout.length === 0) {
+    return (
+      <div className="text-center py-20 text-gray-600">
+        <p className="text-xl font-medium">No items in checkout.</p>
+        <button
+          onClick={() => navigate("/")}
+          className="mt-4 bg-indigo-600 text-white px-6 py-2 rounded-lg shadow hover:bg-indigo-700 transition"
+        >
+          Continue Shopping
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -56,7 +87,7 @@ const CheckoutPage = () => {
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Left: Shipping Info */}
+        {/* 🏠 Shipping Info */}
         <div className="bg-white p-6 shadow-lg rounded-xl border border-gray-100">
           <h2 className="text-xl font-semibold mb-4 text-gray-700">
             Shipping Details
@@ -111,25 +142,33 @@ const CheckoutPage = () => {
           </form>
         </div>
 
-        {/* Right: Order Summary */}
+        {/* 🧾 Order Summary */}
         <div className="bg-white p-6 shadow-lg rounded-xl border border-gray-100">
           <h2 className="text-xl font-semibold mb-4 text-gray-700">
             Order Summary
           </h2>
-          <div className="flex flex-col gap-4">
-            {cartItems.map((item) => (
+
+          <div className="flex flex-col gap-4 max-h-[300px] overflow-y-auto pr-2">
+            {itemsToCheckout.map((item) => (
               <div
                 key={item._id}
                 className="flex justify-between items-center border-b pb-2"
               >
-                <div>
-                  <p className="font-medium text-gray-700">{item.name}</p>
-                  <p className="text-sm text-gray-500">
-                    {item.quantity} × ${item.price.toFixed(2)}
-                  </p>
+                <div className="flex items-center gap-3">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-14 h-14 object-cover rounded-md border"
+                  />
+                  <div>
+                    <p className="font-medium text-gray-700">{item.name}</p>
+                    <p className="text-sm text-gray-500">
+                      {item.quantity} × ৳{item.price.toFixed(2)}
+                    </p>
+                  </div>
                 </div>
                 <span className="font-semibold text-gray-800">
-                  ${(item.quantity * item.price).toFixed(2)}
+                  ৳{(item.quantity * item.price).toFixed(2)}
                 </span>
               </div>
             ))}
@@ -137,7 +176,7 @@ const CheckoutPage = () => {
 
           <div className="flex justify-between mt-6 text-lg font-bold">
             <span>Total:</span>
-            <span>${totalAmount.toFixed(2)}</span>
+            <span>৳{total.toFixed(2)}</span>
           </div>
 
           <button

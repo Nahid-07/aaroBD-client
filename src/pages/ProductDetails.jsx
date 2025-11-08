@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchSingleProduct } from "../features/products/ProductSlice";
 import { ShoppingCart, CreditCard } from "lucide-react";
 import { addToCart } from "../features/cart/cartSlice";
+import { setDirectBuyItem } from "../features/checkout/checkoutSlice";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -12,6 +13,7 @@ const ProductDetails = () => {
   const { singleProduct, loading, error } = useSelector(
     (state) => state.products
   );
+  const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
     dispatch(fetchSingleProduct(id));
@@ -34,9 +36,27 @@ const ProductDetails = () => {
 
   // Handle Buy Now
   const handleBuyNow = () => {
-    // Later: Navigate to checkout page or payment flow
-    navigate("/checkout", { state: { product: singleProduct } });
-  };
+  if (!user) {
+    // Save the product to localStorage temporarily before login
+    localStorage.setItem("pendingDirectBuyItem", JSON.stringify(singleProduct));
+    
+    // Redirect to login with redirect info
+    navigate("/login", { state: { redirectTo: "/checkout" } });
+    return;
+  }
+
+  // If user is logged in, proceed directly
+  dispatch(setDirectBuyItem({
+    _id: singleProduct._id,
+    name: singleProduct.name,
+    price: singleProduct.price,
+    image: singleProduct.image,
+    quantity: 1,
+  }));
+
+  navigate("/checkout");
+};
+
   const handleAddToCart = () => {
     dispatch(addToCart(singleProduct));
   };
