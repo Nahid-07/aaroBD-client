@@ -7,6 +7,7 @@ import ProductDetails from "./pages/ProductDetails";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckOutPage";
 import OrderSuccess from "./pages/OrderSuccess";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <div className="min-h-screen bg-gray-50">
         <Navbar />
         <div className="p-4">
+          <Toaster position="top-center" reverseOrder={false} />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
