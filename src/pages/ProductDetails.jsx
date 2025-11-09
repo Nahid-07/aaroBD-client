@@ -5,6 +5,7 @@ import { fetchSingleProduct } from "../features/products/ProductSlice";
 import { ShoppingCart, CreditCard } from "lucide-react";
 import { addToCart } from "../features/cart/cartSlice";
 import { setDirectBuyItem } from "../features/checkout/checkoutSlice";
+import Loader from "../components/loader/Loader";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -21,9 +22,7 @@ const ProductDetails = () => {
 
   if (loading)
     return (
-      <div className="text-center mt-10 text-gray-600 animate-pulse">
-        Loading product details...
-      </div>
+      <Loader/>
     );
   if (error)
     return <div className="text-center mt-10 text-red-500">Error: {error}</div>;

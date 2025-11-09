@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ProductCard from "../../components/products/ProductCard";
 import { fetchProducts } from "../../features/products/ProductSlice";
+import Loader from "../loader/Loader";
 
 const ProductGrid = () => {
   const dispatch = useDispatch();
@@ -17,7 +18,7 @@ const ProductGrid = () => {
 
   if (loading) {
     return (
-      <div className="text-center mt-10 text-gray-600">Loading products...</div>
+      <Loader/>
     );
   }
 
