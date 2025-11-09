@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { registerUser } from "../features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
+import { ButtonLoader } from "../components/loader/ButtonLoader";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -64,7 +65,7 @@ const Register = () => {
           className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"
           disabled={loading}
         >
-          {loading ? "Registering..." : "Register"}
+          {loading ? <ButtonLoader/> : "Register"}
         </button>
       </form>
     </div>

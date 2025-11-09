@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../features/auth/authSlice";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { setDirectBuyItem } from "../features/checkout/checkoutSlice";
+import { ButtonLoader } from "../components/loader/ButtonLoader";
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -90,7 +91,7 @@ const Login = () => {
             disabled={loading}
             className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition"
           >
-            {loading ? "Logging in..." : "Login"}
+            {loading ? <ButtonLoader/> : "Login"}
           </button>
         </form>
 
