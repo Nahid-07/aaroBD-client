@@ -59,6 +59,20 @@ export const deleteProduct = createAsyncThunk(
     }
   }
 );
+// Update Product (Admin Only)
+export const updateProduct = createAsyncThunk(
+  "products/update",
+  async ({ id, productData }, { rejectWithValue }) => {
+    try {
+      const res = await axiosClient.put(`/products/${id}`, productData);
+      toast.success("Product Updated Successfully!");
+      return res.data;
+    } catch (error) {
+      toast.error("Failed to update product");
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
 
 const productSlice = createSlice({
   name: "products",
@@ -107,6 +121,12 @@ const productSlice = createSlice({
       // --- Delete ---
       .addCase(deleteProduct.fulfilled, (state, action) => {
         state.items = state.items.filter((item) => item._id !== action.payload);
+      })
+      .addCase(updateProduct.fulfilled, (state, action) => {
+        const index = state.items.findIndex(
+          (p) => p._id === action.payload._id
+        );
+        if (index !== -1) state.items[index] = action.payload;
       });
   },
 });
