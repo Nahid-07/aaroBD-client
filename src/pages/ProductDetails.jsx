@@ -4,9 +4,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchSingleProduct } from "../features/products/ProductSlice";
 import { addToCart } from "../features/cart/cartSlice";
 import { setDirectBuyItem } from "../features/checkout/checkoutSlice";
-import { ShoppingCart, CreditCard, Ruler, Palette } from "lucide-react";
+import {
+  ShoppingCart,
+  CreditCard,
+  Ruler,
+  Palette,
+  Star,
+  User,
+} from "lucide-react";
 import Loader from "../components/loader/Loader";
 import toast from "react-hot-toast";
+import ReviewForm from "../components/ReviewForm"; // <--- Import ReviewForm
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -23,29 +31,30 @@ const ProductDetails = () => {
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
 
-useEffect(() => {
-    if (id) {
-      dispatch(fetchSingleProduct(id));
-    }
+  useEffect(() => {
+    dispatch(fetchSingleProduct(id));
   }, [dispatch, id]);
 
-  // 1. Check Loading FIRST
-  if (loading) {
-    return <Loader />;
-  }
-
-  // 2. Then Check Error
-  if (error) {
+  if (loading) return <Loader />;
+  if (error)
     return <div className="text-center mt-10 text-red-500">Error: {error}</div>;
-  }
+  if (!singleProduct)
+    return (
+      <div className="text-center mt-10 text-gray-500">Product not found.</div>
+    );
 
-  // 3. Finally Check Data
-  if (!singleProduct) {
-    return <div className="text-center mt-10 text-gray-500">Product not found.</div>;
-  }
-
-  const { name, image, description, price, inStock, sizes, colors } =
-    singleProduct;
+  const {
+    name,
+    image,
+    description,
+    price,
+    inStock,
+    sizes,
+    colors,
+    reviews,
+    rating,
+    numReviews,
+  } = singleProduct;
 
   // Helper to validate selection
   const validateSelection = () => {
@@ -96,94 +105,183 @@ useEffect(() => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 grid md:grid-cols-2 gap-10">
-      {/* Product Image */}
-      <div className="flex justify-center items-center bg-white rounded-2xl shadow-lg overflow-hidden p-4">
-        <img
-          src={image}
-          alt={name}
-          className="w-full max-h-[500px] object-contain hover:scale-105 transition-transform duration-500"
-        />
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      {/* Product Grid */}
+      <div className="grid md:grid-cols-2 gap-10 mb-16">
+        {/* Product Image */}
+        <div className="flex justify-center items-center bg-white rounded-2xl shadow-lg overflow-hidden p-4">
+          <img
+            src={image}
+            alt={name}
+            className="w-full max-h-[500px] object-contain hover:scale-105 transition-transform duration-500"
+          />
+        </div>
+
+        {/* Product Info */}
+        <div className="flex flex-col justify-center space-y-6">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800">{name}</h1>
+
+            {/* 🌟 Rating Header */}
+            <div className="flex items-center gap-2 mt-2">
+              <div className="flex text-yellow-400">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    size={18}
+                    fill={i < Math.round(rating) ? "currentColor" : "none"}
+                    className={
+                      i < Math.round(rating)
+                        ? "text-yellow-400"
+                        : "text-gray-300"
+                    }
+                  />
+                ))}
+              </div>
+              <span className="text-sm text-gray-500">
+                ({numReviews} Reviews)
+              </span>
+            </div>
+
+            <p className="text-gray-500 text-sm mt-2">In Stock: {inStock}</p>
+          </div>
+
+          <p className="text-gray-600 leading-relaxed">{description}</p>
+
+          <div className="text-3xl font-bold text-indigo-600">৳ {price}</div>
+
+          {/* 📏 Size Selector */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-2">
+              <Ruler size={18} /> Select Size
+            </h3>
+            <div className="flex flex-wrap gap-3">
+              {sizes?.length > 0 ? (
+                sizes.map((size) => (
+                  <button
+                    key={size}
+                    onClick={() => setSelectedSize(size)}
+                    className={`px-4 py-2 rounded-lg border font-medium transition-all ${
+                      selectedSize === size
+                        ? "bg-indigo-600 text-white border-indigo-600 ring-2 ring-indigo-200"
+                        : "bg-white text-gray-700 border-gray-300 hover:border-indigo-400"
+                    }`}
+                  >
+                    {size}
+                  </button>
+                ))
+              ) : (
+                <span className="text-gray-400 text-sm">
+                  No sizes available
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* 🎨 Color Selector */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-2">
+              <Palette size={18} /> Select Color
+            </h3>
+            <div className="flex flex-wrap gap-3">
+              {colors?.length > 0 ? (
+                colors.map((color) => (
+                  <button
+                    key={color}
+                    onClick={() => setSelectedColor(color)}
+                    className={`px-4 py-2 rounded-lg border font-medium transition-all ${
+                      selectedColor === color
+                        ? "bg-indigo-600 text-white border-indigo-600 ring-2 ring-indigo-200"
+                        : "bg-white text-gray-700 border-gray-300 hover:border-indigo-400"
+                    }`}
+                  >
+                    {color}
+                  </button>
+                ))
+              ) : (
+                <span className="text-gray-400 text-sm">
+                  No colors available
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 mt-4">
+            <button
+              onClick={handleAddToCart}
+              className="flex-1 flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-xl shadow transition"
+            >
+              <ShoppingCart size={20} className="mr-2" /> Add to Cart
+            </button>
+
+            <button
+              onClick={handleBuyNow}
+              className="flex-1 flex items-center justify-center bg-linear-to-r from-pink-500 to-orange-500 hover:opacity-90 text-white font-semibold py-3 rounded-xl shadow-md transition"
+            >
+              <CreditCard size={20} className="mr-2" /> Buy Now
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* Product Info */}
-      <div className="flex flex-col justify-center space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-800">{name}</h1>
-          <p className="text-gray-500 text-sm mt-1">In Stock: {inStock}</p>
-        </div>
+      {/* ================= REVIEWS SECTION ================= */}
+      <div className="border-t border-gray-200 pt-10">
+        <h2 className="text-2xl font-bold text-gray-800 mb-6">
+          Customer Reviews ({numReviews})
+        </h2>
 
-        <p className="text-gray-600 leading-relaxed">{description}</p>
-
-        <div className="text-3xl font-bold text-indigo-600">৳ {price}</div>
-
-        {/* 📏 Size Selector */}
-        <div>
-          <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-2">
-            <Ruler size={18} /> Select Size
-          </h3>
-          <div className="flex flex-wrap gap-3">
-            {sizes?.length > 0 ? (
-              sizes.map((size) => (
-                <button
-                  key={size}
-                  onClick={() => setSelectedSize(size)}
-                  className={`px-4 py-2 rounded-lg border font-medium transition-all ${
-                    selectedSize === size
-                      ? "bg-indigo-600 text-white border-indigo-600 ring-2 ring-indigo-200"
-                      : "bg-white text-gray-700 border-gray-300 hover:border-indigo-400"
-                  }`}
-                >
-                  {size}
-                </button>
-              ))
-            ) : (
-              <span className="text-gray-400 text-sm">No sizes available</span>
+        <div className="grid md:grid-cols-2 gap-8">
+          {/* Review List */}
+          <div className="space-y-6">
+            {reviews?.length === 0 && (
+              <div className="bg-gray-50 p-6 rounded-xl text-center text-gray-500">
+                No reviews yet. Be the first to review!
+              </div>
             )}
+
+            {reviews?.map((review) => (
+              <div
+                key={review._id}
+                className="bg-white p-5 rounded-xl shadow-sm border border-gray-100"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="bg-gray-200 p-2 rounded-full text-gray-500">
+                      <User size={16} />
+                    </div>
+                    <span className="font-semibold text-gray-800">
+                      {review.name}
+                    </span>
+                  </div>
+                  <span className="text-xs text-gray-400">
+                    {new Date(review.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+
+                {/* Stars */}
+                <div className="flex text-yellow-400 mb-2">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      size={14}
+                      fill={i < review.rating ? "currentColor" : "none"}
+                      className={
+                        i < review.rating ? "text-yellow-400" : "text-gray-300"
+                      }
+                    />
+                  ))}
+                </div>
+
+                <p className="text-gray-600 text-sm">{review.comment}</p>
+              </div>
+            ))}
           </div>
-        </div>
 
-        {/* 🎨 Color Selector */}
-        <div>
-          <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-2">
-            <Palette size={18} /> Select Color
-          </h3>
-          <div className="flex flex-wrap gap-3">
-            {colors?.length > 0 ? (
-              colors.map((color) => (
-                <button
-                  key={color}
-                  onClick={() => setSelectedColor(color)}
-                  className={`px-4 py-2 rounded-lg border font-medium transition-all ${
-                    selectedColor === color
-                      ? "bg-indigo-600 text-white border-indigo-600 ring-2 ring-indigo-200"
-                      : "bg-white text-gray-700 border-gray-300 hover:border-indigo-400"
-                  }`}
-                >
-                  {color}
-                </button>
-              ))
-            ) : (
-              <span className="text-gray-400 text-sm">No colors available</span>
-            )}
+          {/* Review Form */}
+          <div>
+            <ReviewForm />
           </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 mt-4">
-          <button
-            onClick={handleAddToCart}
-            className="flex-1 flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-xl shadow transition"
-          >
-            <ShoppingCart size={20} className="mr-2" /> Add to Cart
-          </button>
-
-          <button
-            onClick={handleBuyNow}
-            className="flex-1 flex items-center justify-center bg-linear-to-r from-pink-500 to-orange-500 hover:opacity-90 text-white font-semibold py-3 rounded-xl shadow-md transition"
-          >
-            <CreditCard size={20} className="mr-2" /> Buy Now
-          </button>
         </div>
       </div>
     </div>

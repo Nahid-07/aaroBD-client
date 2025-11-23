@@ -2,6 +2,8 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosClient from "../../api/axiosClient";
 import { toast } from "react-hot-toast";
 
+// --- PUBLIC ACTIONS ---
+
 // Fetch all products
 export const fetchProducts = createAsyncThunk(
   "products/fetchAll",
@@ -25,12 +27,29 @@ export const fetchSingleProduct = createAsyncThunk(
       const res = await axiosClient.get(`/products/${id}`);
       return res.data;
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   }
 );
 
-// Create Product (Admin Only)
+// Create Review (User)
+export const createReview = createAsyncThunk(
+  "products/createReview",
+  async ({ id, reviewData }, { rejectWithValue }) => {
+    try {
+      await axiosClient.post(`/products/${id}/reviews`, reviewData);
+      toast.success("Review Submitted!");
+      return id; // Return ID to trigger re-fetch
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to submit review");
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
+// --- ADMIN ACTIONS ---
+
+// Create Product (Admin)
 export const createProduct = createAsyncThunk(
   "products/create",
   async (productData, { rejectWithValue }) => {
@@ -45,21 +64,7 @@ export const createProduct = createAsyncThunk(
   }
 );
 
-// Delete Product (Admin Only)
-export const deleteProduct = createAsyncThunk(
-  "products/delete",
-  async (id, { rejectWithValue }) => {
-    try {
-      await axiosClient.delete(`/products/${id}`);
-      toast.success("Product Deleted!");
-      return id;
-    } catch (error) {
-      toast.error("Failed to delete product");
-      return rejectWithValue(error.response?.data?.message);
-    }
-  }
-);
-// Update Product (Admin Only)
+// Update Product (Admin)
 export const updateProduct = createAsyncThunk(
   "products/update",
   async ({ id, productData }, { rejectWithValue }) => {
@@ -69,6 +74,21 @@ export const updateProduct = createAsyncThunk(
       return res.data;
     } catch (error) {
       toast.error("Failed to update product");
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
+// Delete Product (Admin)
+export const deleteProduct = createAsyncThunk(
+  "products/delete",
+  async (id, { rejectWithValue }) => {
+    try {
+      await axiosClient.delete(`/products/${id}`);
+      toast.success("Product Deleted!");
+      return id;
+    } catch (error) {
+      toast.error("Failed to delete product");
       return rejectWithValue(error.response?.data?.message);
     }
   }
@@ -85,7 +105,7 @@ const productSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // --- Fetch All ---
+      // Fetch All
       .addCase(fetchProducts.pending, (state) => {
         state.loading = true;
       })
@@ -98,11 +118,10 @@ const productSlice = createSlice({
         state.error = action.payload;
       })
 
-      // --- Fetch Single (THIS WAS MISSING) ---
+      // Fetch Single
       .addCase(fetchSingleProduct.pending, (state) => {
         state.loading = true;
         state.error = null;
-        state.singleProduct = null; // Reset old product while loading
       })
       .addCase(fetchSingleProduct.fulfilled, (state, action) => {
         state.loading = false;
@@ -113,20 +132,37 @@ const productSlice = createSlice({
         state.error = action.payload;
       })
 
-      // --- Create ---
+      // Admin: Create
       .addCase(createProduct.fulfilled, (state, action) => {
         state.items.push(action.payload);
       })
 
-      // --- Delete ---
-      .addCase(deleteProduct.fulfilled, (state, action) => {
-        state.items = state.items.filter((item) => item._id !== action.payload);
-      })
+      // Admin: Update
       .addCase(updateProduct.fulfilled, (state, action) => {
         const index = state.items.findIndex(
           (p) => p._id === action.payload._id
         );
         if (index !== -1) state.items[index] = action.payload;
+        // Also update singleProduct if it's currently being viewed
+        if (state.singleProduct?._id === action.payload._id) {
+          state.singleProduct = action.payload;
+        }
+      })
+
+      // Admin: Delete
+      .addCase(deleteProduct.fulfilled, (state, action) => {
+        state.items = state.items.filter((item) => item._id !== action.payload);
+      })
+
+      // Reviews
+      .addCase(createReview.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(createReview.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(createReview.rejected, (state) => {
+        state.loading = false;
       });
   },
 });
