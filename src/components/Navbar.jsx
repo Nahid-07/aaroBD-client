@@ -73,17 +73,23 @@ const Navbar = () => {
 
             {/* User / Auth Section */}
             {user ? (
-              <div className="flex items-center space-x-2 text-white">
-                <User size={22} />
-                <span className="hidden sm:block text-sm">
-                  Hi, {user.name.split(" ")[0]}
-                </span>
+              <div className="flex items-center space-x-4 text-white">
+                <Link
+                  to="/profile"
+                  className="flex items-center gap-2 hover:text-yellow-300 transition"
+                >
+                  <User size={22} />
+                  <span className="hidden sm:block font-medium">
+                    Hi, {user.name.split(" ")[0]}
+                  </span>
+                </Link>
+
                 <button
                   onClick={handleLogOut}
-                  className="flex items-center space-x-1 bg-yellow-400 hover:bg-yellow-300 text-gray-800 font-semibold px-3 py-1 rounded-md text-sm transition"
+                  className="bg-white/10 hover:bg-white/20 p-2 rounded-full transition"
+                  title="Logout"
                 >
-                  <LogOut size={16} />
-                  <span>Logout</span>
+                  <LogOut size={20} />
                 </button>
               </div>
             ) : (

@@ -9,6 +9,7 @@ import CheckoutPage from "./pages/CheckOutPage";
 import OrderSuccess from "./pages/OrderSuccess";
 import { Toaster } from "react-hot-toast";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import ProfilePage from "./pages/ProfilePage";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/order-success" element={<OrderSuccess />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/profile" element={<ProfilePage />} />
           </Routes>
         </div>
       </div>
