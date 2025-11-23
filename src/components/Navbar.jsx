@@ -94,7 +94,14 @@ const Navbar = () => {
                 Login
               </Link>
             )}
-
+            {user && user.isAdmin && (
+              <Link
+                to="/admin/dashboard"
+                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm font-semibold transition"
+              >
+                Admin Dashboard
+              </Link>
+            )}
             {/* Mobile Menu Toggle */}
             <button
               className="md:hidden text-white"
