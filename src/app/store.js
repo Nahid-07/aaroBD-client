@@ -3,6 +3,7 @@ import authReducer from "../features/auth/authSlice";
 import productReducer from "../features/products/ProductSlice";
 import cartReducer from "../features/cart/cartSlice";
 import checkoutReducer from "../features/checkout/checkoutSlice";
+import orderReducer from "../features/orders/orderSlice"
 
 export const store = configureStore({
   reducer: {
@@ -10,5 +11,6 @@ export const store = configureStore({
     products : productReducer,
     cart: cartReducer,
     checkout: checkoutReducer,
+    orders: orderReducer,
   },
 });

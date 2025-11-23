@@ -10,7 +10,9 @@ export const fetchProducts = createAsyncThunk(
       const res = await axiosClient.get("/products");
       return res.data;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "Failed to load products");
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to load products"
+      );
     }
   }
 );
@@ -28,7 +30,7 @@ export const fetchSingleProduct = createAsyncThunk(
   }
 );
 
-// 🆕 Create Product (Admin Only)
+// Create Product (Admin Only)
 export const createProduct = createAsyncThunk(
   "products/create",
   async (productData, { rejectWithValue }) => {
@@ -43,14 +45,14 @@ export const createProduct = createAsyncThunk(
   }
 );
 
-// 🆕 Delete Product (Admin Only)
+// Delete Product (Admin Only)
 export const deleteProduct = createAsyncThunk(
   "products/delete",
   async (id, { rejectWithValue }) => {
     try {
       await axiosClient.delete(`/products/${id}`);
       toast.success("Product Deleted!");
-      return id; // Return ID to remove it from state
+      return id;
     } catch (error) {
       toast.error("Failed to delete product");
       return rejectWithValue(error.response?.data?.message);
@@ -69,8 +71,10 @@ const productSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch
-      .addCase(fetchProducts.pending, (state) => { state.loading = true; })
+      // --- Fetch All ---
+      .addCase(fetchProducts.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.loading = false;
         state.items = action.payload;
@@ -79,11 +83,28 @@ const productSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      // Create
+
+      // --- Fetch Single (THIS WAS MISSING) ---
+      .addCase(fetchSingleProduct.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.singleProduct = null; // Reset old product while loading
+      })
+      .addCase(fetchSingleProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        state.singleProduct = action.payload;
+      })
+      .addCase(fetchSingleProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // --- Create ---
       .addCase(createProduct.fulfilled, (state, action) => {
         state.items.push(action.payload);
       })
-      // Delete
+
+      // --- Delete ---
       .addCase(deleteProduct.fulfilled, (state, action) => {
         state.items = state.items.filter((item) => item._id !== action.payload);
       });

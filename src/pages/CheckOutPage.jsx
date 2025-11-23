@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axiosClient from "../api/axiosClient";
 import { clearDirectBuyItem } from "../features/checkout/checkoutSlice";
+import { toast } from "react-hot-toast";
 
 const CheckoutPage = () => {
   const dispatch = useDispatch();
@@ -14,6 +15,8 @@ const CheckoutPage = () => {
   const { directBuyItem } = useSelector((state) => state.checkout);
 
   const itemsToCheckout = directBuyItem ? [directBuyItem] : cartItems;
+
+  // Recalculate total to be safe
   const total = directBuyItem
     ? directBuyItem.price * directBuyItem.quantity
     : totalAmount;
@@ -37,15 +40,25 @@ const CheckoutPage = () => {
   const handlePlaceOrder = async () => {
     try {
       if (!itemsToCheckout || itemsToCheckout.length === 0) {
-        alert("No items to checkout!");
+        toast.error("No items to checkout!");
         return;
       }
 
+      // 📝 Validate Shipping Info
+      if (!shippingInfo.address || !shippingInfo.phone) {
+        toast.error("Please fill in all shipping details");
+        return;
+      }
+
+      // 🛠️ FIX: Include Size, Color, and Price in the payload
       const orderData = {
         user: user._id,
         items: itemsToCheckout.map((item) => ({
           product: item._id,
           quantity: item.quantity,
+          size: item.size, // <--- Send Size
+          color: item.color, // <--- Send Color
+          price: item.price, // <--- Send Price (Backend expects this now)
         })),
         totalPrice: total,
         shippingInfo,
@@ -56,13 +69,17 @@ const CheckoutPage = () => {
       });
 
       if (res.status === 201) {
+        toast.success("Order Placed Successfully! 🎉");
         dispatch(clearCart());
         dispatch(clearDirectBuyItem());
         navigate("/order-success");
       }
     } catch (error) {
       console.error("Order failed:", error.response?.data || error.message);
-      alert("Something went wrong while placing your order.");
+      const errorMsg =
+        error.response?.data?.message ||
+        "Something went wrong while placing your order.";
+      toast.error(errorMsg);
     }
   };
 
@@ -151,7 +168,7 @@ const CheckoutPage = () => {
           <div className="flex flex-col gap-4 max-h-[300px] overflow-y-auto pr-2">
             {itemsToCheckout.map((item) => (
               <div
-                key={item._id}
+                key={item.cartId || item._id} // Use cartId if available
                 className="flex justify-between items-center border-b pb-2"
               >
                 <div className="flex items-center gap-3">
@@ -162,6 +179,9 @@ const CheckoutPage = () => {
                   />
                   <div>
                     <p className="font-medium text-gray-700">{item.name}</p>
+                    <p className="text-xs text-gray-500">
+                      {item.size} | {item.color}
+                    </p>
                     <p className="text-sm text-gray-500">
                       {item.quantity} × ৳{item.price.toFixed(2)}
                     </p>
@@ -192,3 +212,4 @@ const CheckoutPage = () => {
 };
 
 export default CheckoutPage;
+ 

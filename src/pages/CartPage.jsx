@@ -43,7 +43,8 @@ const CartPage = () => {
       <div className="flex flex-col gap-6">
         {cartItems.map((item) => (
           <div
-            key={item._id}
+            //Use cartId instead of _id to distinguish variants
+            key={item.cartId}
             className="flex flex-col sm:flex-row items-center justify-between bg-white shadow-md rounded-xl p-4 sm:p-6 border border-gray-100"
           >
             <div className="flex items-center gap-4">
@@ -59,6 +60,14 @@ const CartPage = () => {
                 <p className="text-sm text-gray-500">
                   ৳ {item.price.toFixed(2)}
                 </p>
+
+                {/*Display Size & Color */}
+                <div className="mt-1 flex gap-2 text-xs text-gray-500 font-medium bg-gray-50 px-2 py-1 rounded w-fit">
+                  <span className="border-r border-gray-300 pr-2">
+                    Size: {item.size}
+                  </span>
+                  <span>Color: {item.color}</span>
+                </div>
               </div>
             </div>
 
@@ -66,8 +75,8 @@ const CartPage = () => {
               {/* Quantity Controls */}
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => dispatch(decreaseQuantity(item._id))}
-                  className="p-2 bg-gray-200 hover:bg-gray-300 rounded-full"
+                  onClick={() => dispatch(decreaseQuantity(item.cartId))}
+                  className="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition"
                 >
                   <Minus size={16} />
                 </button>
@@ -75,22 +84,22 @@ const CartPage = () => {
                   {item.quantity}
                 </span>
                 <button
-                  onClick={() => dispatch(increaseQuantity(item._id))}
-                  className="p-2 bg-gray-200 hover:bg-gray-300 rounded-full"
+                  onClick={() => dispatch(increaseQuantity(item.cartId))}
+                  className="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition"
                 >
                   <Plus size={16} />
                 </button>
               </div>
 
               {/* Total per item */}
-              <span className="font-semibold text-gray-700">
+              <span className="font-semibold text-gray-700 min-w-20 text-right">
                 ৳{(item.price * item.quantity).toFixed(2)}
               </span>
 
               {/* Remove Button */}
               <button
-                onClick={() => dispatch(removeFromCart(item._id))}
-                className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-full"
+                onClick={() => dispatch(removeFromCart(item.cartId))}
+                className="p-2 bg-red-50 hover:bg-red-100 text-red-500 rounded-full transition"
               >
                 <Trash2 size={18} />
               </button>

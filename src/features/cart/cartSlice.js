@@ -6,7 +6,6 @@ const initialState = {
   totalQuantity: 0,
 };
 
-// helper to recalc totals + persist
 const updateTotals = (state) => {
   state.totalQuantity = state.cartItems.reduce((sum, i) => sum + i.quantity, 0);
   state.totalAmount = state.cartItems.reduce(
@@ -22,29 +21,40 @@ const cartSlice = createSlice({
   reducers: {
     addToCart: (state, action) => {
       const item = action.payload;
-      const exist = state.cartItems.find((x) => x._id === item._id);
+
+      // 🔑 Generate a unique ID for this specific variant
+      const cartId = `${item._id}-${item.size}-${item.color}`;
+
+      const exist = state.cartItems.find((x) => x.cartId === cartId);
 
       if (exist) {
         exist.quantity += 1;
       } else {
-        state.cartItems.push({ ...item, quantity: 1 });
+        state.cartItems.push({
+          ...item,
+          cartId, // Save the unique ID
+          quantity: 1,
+        });
       }
       updateTotals(state);
     },
 
     removeFromCart: (state, action) => {
-      state.cartItems = state.cartItems.filter((x) => x._id !== action.payload);
+      // Now we remove by cartId, not just product _id
+      state.cartItems = state.cartItems.filter(
+        (x) => x.cartId !== action.payload
+      );
       updateTotals(state);
     },
 
     increaseQuantity: (state, action) => {
-      const item = state.cartItems.find((x) => x._id === action.payload);
+      const item = state.cartItems.find((x) => x.cartId === action.payload);
       if (item) item.quantity += 1;
       updateTotals(state);
     },
 
     decreaseQuantity: (state, action) => {
-      const item = state.cartItems.find((x) => x._id === action.payload);
+      const item = state.cartItems.find((x) => x.cartId === action.payload);
       if (item && item.quantity > 1) item.quantity -= 1;
       updateTotals(state);
     },
