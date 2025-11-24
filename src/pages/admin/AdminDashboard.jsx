@@ -85,12 +85,14 @@ const AdminDashboard = () => {
     setEditProductId(product._id);
     setFormData({
       name: product.name,
-      price: product.price,
+      price: String(product.price),
       description: product.description,
       category: product.category,
       gender: product.gender,
       image: product.image,
-      colors: product.colors.join(", "),
+      colors: Array.isArray(product.colors)
+        ? product.colors.join(", ")
+        : product.colors,
       inStock: product.inStock,
       sizes: product.sizes,
     });
@@ -98,7 +100,7 @@ const AdminDashboard = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleProductSubmit = (e) => {
+  const handleProductSubmit = async (e) => {
     e.preventDefault();
 
     // Basic Validation
@@ -117,6 +119,7 @@ const AdminDashboard = () => {
       return;
     }
 
+    // Prepare data for submission
     const productData = {
       ...formData,
       price: Number(formData.price),
@@ -128,26 +131,33 @@ const AdminDashboard = () => {
       sizes: formData.sizes,
     };
 
-    if (editProductId) {
-      dispatch(updateProduct({ id: editProductId, productData }));
-    } else {
-      dispatch(createProduct(productData));
-    }
+    try {
+      if (editProductId) {
+        await dispatch(
+          updateProduct({ id: editProductId, productData })
+        ).unwrap();
+      } else {
+        await dispatch(createProduct(productData)).unwrap();
+      }
 
-    // Reset Form & UI
-    setShowForm(false);
-    setEditProductId(null);
-    setFormData({
-      name: "",
-      price: "",
-      description: "",
-      category: "Oversized",
-      gender: "Unisex",
-      image: "",
-      colors: "",
-      inStock: 10,
-      sizes: ["M", "L"],
-    });
+      // Only reset if successful
+      setShowForm(false);
+      setEditProductId(null);
+      setFormData({
+        name: "",
+        price: "",
+        description: "",
+        category: "Oversized",
+        gender: "Unisex",
+        image: "",
+        colors: "",
+        inStock: 10,
+        sizes: ["M", "L"],
+      });
+    } catch (error) {
+      console.error("Failed to save product:", error);
+      // toast error is handled in slice, but good to catch here to prevent form clear on error
+    }
   };
 
   // --- RENDER GUARDS ---
