@@ -4,12 +4,13 @@ import { toast } from "react-hot-toast";
 
 // --- PUBLIC ACTIONS ---
 
-// Fetch all products
+// Fetch all products (Updated for Pagination & Filtering)
 export const fetchProducts = createAsyncThunk(
   "products/fetchAll",
-  async (_, { rejectWithValue }) => {
+  async (params = {}, { rejectWithValue }) => {
     try {
-      const res = await axiosClient.get("/products");
+      // params can include: { page, keyword, category, gender, sort }
+      const res = await axiosClient.get("/products", { params });
       return res.data;
     } catch (err) {
       return rejectWithValue(
@@ -39,7 +40,7 @@ export const createReview = createAsyncThunk(
     try {
       await axiosClient.post(`/products/${id}/reviews`, reviewData);
       toast.success("Review Submitted!");
-      return id; // Return ID to trigger re-fetch
+      return id;
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to submit review");
       return rejectWithValue(error.response?.data?.message);
@@ -49,7 +50,7 @@ export const createReview = createAsyncThunk(
 
 // --- ADMIN ACTIONS ---
 
-// Create Product (Admin)
+// Create Product
 export const createProduct = createAsyncThunk(
   "products/create",
   async (productData, { rejectWithValue }) => {
@@ -64,7 +65,7 @@ export const createProduct = createAsyncThunk(
   }
 );
 
-// Update Product (Admin)
+// Update Product
 export const updateProduct = createAsyncThunk(
   "products/update",
   async ({ id, productData }, { rejectWithValue }) => {
@@ -79,7 +80,7 @@ export const updateProduct = createAsyncThunk(
   }
 );
 
-// Delete Product (Admin)
+// Delete Product
 export const deleteProduct = createAsyncThunk(
   "products/delete",
   async (id, { rejectWithValue }) => {
@@ -98,6 +99,9 @@ const productSlice = createSlice({
   name: "products",
   initialState: {
     items: [],
+    page: 1,
+    pages: 1,
+    total: 0,
     loading: false,
     error: null,
     singleProduct: null,
@@ -111,7 +115,10 @@ const productSlice = createSlice({
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = action.payload;
+        state.items = action.payload.products;
+        state.page = action.payload.page;
+        state.pages = action.payload.pages;
+        state.total = action.payload.totalProducts;
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.loading = false;
@@ -122,6 +129,7 @@ const productSlice = createSlice({
       .addCase(fetchSingleProduct.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.singleProduct = null;
       })
       .addCase(fetchSingleProduct.fulfilled, (state, action) => {
         state.loading = false;
@@ -132,37 +140,30 @@ const productSlice = createSlice({
         state.error = action.payload;
       })
 
-      // Admin: Create
+      // Admin Create
       .addCase(createProduct.fulfilled, (state, action) => {
         state.items.push(action.payload);
       })
 
-      // Admin: Update
+      // Admin Update
       .addCase(updateProduct.fulfilled, (state, action) => {
         const index = state.items.findIndex(
           (p) => p._id === action.payload._id
         );
         if (index !== -1) state.items[index] = action.payload;
-        // Also update singleProduct if it's currently being viewed
         if (state.singleProduct?._id === action.payload._id) {
           state.singleProduct = action.payload;
         }
       })
 
-      // Admin: Delete
+      // Admin Delete
       .addCase(deleteProduct.fulfilled, (state, action) => {
         state.items = state.items.filter((item) => item._id !== action.payload);
       })
 
-      // Reviews
-      .addCase(createReview.pending, (state) => {
-        state.loading = true;
-      })
+      // Review
       .addCase(createReview.fulfilled, (state) => {
-        state.loading = false;
-      })
-      .addCase(createReview.rejected, (state) => {
-        state.loading = false;
+        state.loading = false
       });
   },
 });
