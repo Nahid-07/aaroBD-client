@@ -7,7 +7,7 @@ import Loader from "../components/loader/Loader";
 
 const Shop = () => {
   const dispatch = useDispatch();
-  // 🆕 Get pagination data from Redux
+  // Get pagination data from Redux
   const {
     items: products,
     loading,
@@ -55,6 +55,17 @@ const Shop = () => {
     setCurrentPage(1);
   }, [searchQuery, selectedCategory, selectedGender, sortOrder]);
 
+  // Close mobile filters when screen resizes to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setShowMobileFilters(false);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   if (loading && products.length === 0) return <Loader />; // Show loader only on initial load or empty state
   if (error)
     return (
@@ -65,23 +76,33 @@ const Shop = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div className="flex flex-col lg:flex-row gap-10">
-        {/* 🔍 SIDEBAR FILTERS (UNCHANGED - Logic moved to useEffect) */}
+      <div className="flex flex-col lg:flex-row gap-10 relative">
+        {/* 🔍 MOBILE OVERLAY (Click to close) */}
         <div
-          className={`fixed inset-0 bg-white z-40 p-6 lg:static lg:block lg:w-1/4 lg:p-0 lg:bg-transparent transition-transform duration-300 ${
-            showMobileFilters
-              ? "translate-x-0"
-              : "-translate-x-full lg:translate-x-0"
+          className={`fixed inset-0 bg-black/50 z-40 lg:hidden transition-opacity duration-300 ${
+            showMobileFilters ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
+          onClick={() => setShowMobileFilters(false)}
+        />
+
+        {/* 🔍 SIDEBAR FILTERS (Desktop & Mobile) */}
+        <div
+          className={`fixed top-0 left-0 h-full w-[80%] max-w-xs bg-white z-50 p-6 shadow-2xl transform transition-transform duration-300 lg:static lg:block lg:w-1/4 lg:h-auto lg:shadow-none lg:p-0 lg:bg-transparent lg:transform-none ${
+            showMobileFilters ? "translate-x-0" : "-translate-x-full"
           }`}
         >
+          {/* Mobile Close Button */}
           <div className="flex justify-between items-center lg:hidden mb-6">
             <h2 className="text-xl font-bold text-gray-800">Filters</h2>
-            <button onClick={() => setShowMobileFilters(false)}>
-              <X size={24} />
+            <button
+              onClick={() => setShowMobileFilters(false)}
+              className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition"
+            >
+              <X size={20} />
             </button>
           </div>
 
-          <div className="space-y-8">
+          <div className="space-y-8 overflow-y-auto max-h-[calc(100vh-100px)] lg:max-h-none pr-2 custom-scrollbar">
             {/* Search */}
             <div className="relative">
               <Search
@@ -93,7 +114,7 @@ const Shop = () => {
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
               />
             </div>
 
@@ -110,7 +131,11 @@ const Shop = () => {
                       type="radio"
                       name="category"
                       checked={selectedCategory === cat}
-                      onChange={() => setSelectedCategory(cat)}
+                      onChange={() => {
+                        setSelectedCategory(cat);
+                        if (window.innerWidth < 1024)
+                          setShowMobileFilters(false);
+                      }}
                       className="text-indigo-600 focus:ring-indigo-500"
                     />
                     <span
@@ -140,7 +165,11 @@ const Shop = () => {
                       type="radio"
                       name="gender"
                       checked={selectedGender === gen}
-                      onChange={() => setSelectedGender(gen)}
+                      onChange={() => {
+                        setSelectedGender(gen);
+                        if (window.innerWidth < 1024)
+                          setShowMobileFilters(false);
+                      }}
                       className="text-indigo-600 focus:ring-indigo-500"
                     />
                     <span
@@ -165,7 +194,7 @@ const Shop = () => {
               <select
                 value={sortOrder}
                 onChange={(e) => setSortOrder(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none focus:border-indigo-500"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none focus:border-indigo-500 bg-white"
               >
                 <option value="default">Newest First</option>
                 <option value="lowToHigh">Price: Low to High</option>
@@ -177,11 +206,12 @@ const Shop = () => {
 
         {/* 👕 PRODUCT GRID AREA */}
         <div className="flex-1">
+          {/* Mobile Toggle Button */}
           <button
             onClick={() => setShowMobileFilters(true)}
-            className="lg:hidden mb-6 flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-lg text-gray-700 font-medium hover:bg-gray-200 transition"
+            className="lg:hidden mb-6 flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-lg text-gray-700 font-medium hover:bg-gray-200 transition w-full justify-center"
           >
-            <Filter size={20} /> Filters
+            <Filter size={20} /> Filter & Search
           </button>
 
           <div className="mb-6">
