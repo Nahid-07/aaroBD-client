@@ -125,7 +125,7 @@ const Navbar = () => {
           {menuItems.map((item, i) => (
             <Link
               key={i}
-              to={`/${item.path}`}
+              to={item.path}
               onClick={() => setMenuOpen(false)}
               className="block px-4 py-2 text-white hover:bg-indigo-600 transition"
             >
