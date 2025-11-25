@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { ShoppingCart } from "lucide-react";
 
 const ProductCard = ({ product }) => {
-  console.log(product)
   return (
     <Link
       to={`/product/${product._id}`}

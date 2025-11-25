@@ -25,6 +25,20 @@ export const loginUser = createAsyncThunk(
   }
 );
 
+// Google Login Thunk
+export const googleLogin = createAsyncThunk(
+  "auth/googleLogin",
+  async (credential, { rejectWithValue }) => {
+    try {
+      // Send the ID token to your backend
+      const res = await axiosClient.post("/auth/google", { token: credential });
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response.data.message);
+    }
+  }
+);
+
 const initialState = {
   user: JSON.parse(localStorage.getItem("user")) || null,
   loading: false,
@@ -68,6 +82,20 @@ const authSlice = createSlice({
         localStorage.setItem("token", action.payload.token);
       })
       .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(googleLogin.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(googleLogin.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+        localStorage.setItem("user", JSON.stringify(action.payload));
+        localStorage.setItem("token", action.payload.token);
+      })
+      .addCase(googleLogin.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
