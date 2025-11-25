@@ -37,12 +37,6 @@ const Register = () => {
     }
   };
 
-  // 🔥 Google Login Placeholder
-  const handleGoogleSignIn = () => {
-    toast("Google Sign-In not yet implemented", { icon: "⚙️" });
-    // Later you can integrate Firebase or OAuth2 here
-  };
-
   return (
     <div className="flex justify-center items-center min-h-screen bg-linear-to-br from-indigo-600 via-purple-600 to-pink-500 p-4">
       <motion.div
@@ -133,22 +127,6 @@ const Register = () => {
             {loading ? <ButtonLoader/> : "Register"}
           </button>
         </form>
-
-        {/* Divider */}
-        <div className="flex items-center my-6">
-          <div className="flex-1 border-t border-gray-300"></div>
-          <span className="mx-3 text-gray-500 text-sm">or</span>
-          <div className="flex-1 border-t border-gray-300"></div>
-        </div>
-
-        {/* Google Button */}
-        <button
-          onClick={handleGoogleSignIn}
-          className="w-full flex items-center justify-center border border-gray-300 rounded-lg py-2.5 shadow-sm hover:bg-gray-50 transition-all"
-        >
-          <FcGoogle size={22} className="mr-3" />
-          <span className="font-medium text-gray-700">Continue with Google</span>
-        </button>
 
         {/* Login Link */}
         <p className="text-center text-gray-600 text-sm mt-5">
