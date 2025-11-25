@@ -21,11 +21,10 @@ const Shop = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedGender, setSelectedGender] = useState("All");
   const [sortOrder, setSortOrder] = useState("default");
-  const [currentPage, setCurrentPage] = useState(1); // Local page state
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
-  // 🧠 Fetch Products whenever any filter or page changes
   useEffect(() => {
     // Debounce search to avoid too many requests while typing
     const timer = setTimeout(() => {
@@ -76,7 +75,7 @@ const Shop = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div className="flex flex-col lg:flex-row gap-10 relative">
+      <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 relative">
         {/* 🔍 MOBILE OVERLAY (Click to close) */}
         <div
           className={`fixed inset-0 bg-black/50 z-40 lg:hidden transition-opacity duration-300 ${
@@ -86,10 +85,17 @@ const Shop = () => {
         />
 
         {/* 🔍 SIDEBAR FILTERS (Desktop & Mobile) */}
-        <div
-          className={`fixed top-0 left-0 h-full w-[80%] max-w-xs bg-white z-50 p-6 shadow-2xl transform transition-transform duration-300 lg:static lg:block lg:w-1/4 lg:h-auto lg:shadow-none lg:p-0 lg:bg-transparent lg:transform-none ${
-            showMobileFilters ? "translate-x-0" : "-translate-x-full"
-          }`}
+        <aside
+          className={`
+            fixed top-0 left-0 h-full w-72 bg-white z-50 p-6 shadow-2xl 
+            transform transition-transform duration-300 ease-in-out
+            lg:static lg:block lg:h-auto lg:w-64 lg:min-w-[16rem] lg:shadow-none lg:p-0 lg:bg-transparent lg:transform-none
+            ${
+              showMobileFilters
+                ? "translate-x-0"
+                : "-translate-x-full lg:translate-x-0"
+            }
+          `}
         >
           {/* Mobile Close Button */}
           <div className="flex justify-between items-center lg:hidden mb-6">
@@ -102,7 +108,7 @@ const Shop = () => {
             </button>
           </div>
 
-          <div className="space-y-8 overflow-y-auto max-h-[calc(100vh-100px)] lg:max-h-none pr-2 custom-scrollbar">
+          <div className="space-y-8 overflow-y-auto max-h-[calc(100vh-100px)] lg:max-h-none lg:overflow-visible pr-2 custom-scrollbar">
             {/* Search */}
             <div className="relative">
               <Search
@@ -202,10 +208,10 @@ const Shop = () => {
               </select>
             </div>
           </div>
-        </div>
+        </aside>
 
         {/* 👕 PRODUCT GRID AREA */}
-        <div className="flex-1">
+        <div className="flex-1 w-full">
           {/* Mobile Toggle Button */}
           <button
             onClick={() => setShowMobileFilters(true)}
@@ -233,7 +239,7 @@ const Shop = () => {
                 ))}
               </div>
 
-              {/* 🆕 PAGINATION CONTROLS */}
+              {/*PAGINATION CONTROLS */}
               <div className="mt-10 flex justify-center items-center gap-4">
                 <button
                   onClick={() =>
