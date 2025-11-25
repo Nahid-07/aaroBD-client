@@ -119,7 +119,6 @@ const AdminDashboard = () => {
       return;
     }
 
-    // Prepare data for submission
     const productData = {
       ...formData,
       price: Number(formData.price),
@@ -140,7 +139,6 @@ const AdminDashboard = () => {
         await dispatch(createProduct(productData)).unwrap();
       }
 
-      // Only reset if successful
       setShowForm(false);
       setEditProductId(null);
       setFormData({
@@ -156,7 +154,6 @@ const AdminDashboard = () => {
       });
     } catch (error) {
       console.error("Failed to save product:", error);
-      // toast error is handled in slice, but good to catch here to prevent form clear on error
     }
   };
 
@@ -396,10 +393,12 @@ const AdminDashboard = () => {
                   <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded backdrop-blur-md">
                     {product.category}
                   </div>
-                  <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition">
+
+                  {/* 🛠️ FIX: Action Buttons Visible on Mobile, Hover on Desktop */}
+                  <div className="absolute top-2 right-2 flex gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition duration-200">
                     <button
                       onClick={() => handleEditClick(product)}
-                      className="bg-white text-indigo-600 p-2 rounded-full shadow-md hover:bg-indigo-50"
+                      className="bg-white text-indigo-600 p-2 rounded-full shadow-md hover:bg-indigo-50 transition-transform active:scale-95"
                     >
                       <Edit2 size={18} />
                     </button>
@@ -408,7 +407,7 @@ const AdminDashboard = () => {
                         if (window.confirm("Delete?"))
                           dispatch(deleteProduct(product._id));
                       }}
-                      className="bg-white text-red-500 p-2 rounded-full shadow-md hover:bg-red-50"
+                      className="bg-white text-red-500 p-2 rounded-full shadow-md hover:bg-red-50 transition-transform active:scale-95"
                     >
                       <Trash2 size={18} />
                     </button>
@@ -469,7 +468,7 @@ const AdminDashboard = () => {
                 <th className="p-5 font-semibold text-gray-600 text-sm uppercase">
                   Customer
                 </th>
-                <th className="p-5 font-semibold text-gray-600 text-sm uppercase">
+                <th className="p-5 font-semibold text-gray-600 text-sm uppercase hidden md:table-cell">
                   Date
                 </th>
                 <th className="p-5 font-semibold text-gray-600 text-sm uppercase">
@@ -492,7 +491,7 @@ const AdminDashboard = () => {
                   <td className="p-5 font-medium text-gray-800">
                     {order.shippingInfo?.name}
                   </td>
-                  <td className="p-5 text-sm text-gray-500">
+                  <td className="p-5 text-sm text-gray-500 hidden md:table-cell">
                     {new Date(order.createdAt).toLocaleDateString()}
                   </td>
                   <td className="p-5 font-bold text-indigo-600">
