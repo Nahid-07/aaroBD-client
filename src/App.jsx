@@ -11,6 +11,7 @@ import { Toaster } from "react-hot-toast";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ProfilePage from "./pages/ProfilePage";
 import Shop from "./pages/Shop";
+import About from "./pages/About";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/shop" element={<Shop />} />
+            <Route path="/about" element={<About />}/>
           </Routes>
         </div>
       </div>
