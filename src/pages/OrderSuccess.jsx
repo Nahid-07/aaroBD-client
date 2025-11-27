@@ -2,9 +2,10 @@ import { Link } from "react-router-dom";
 import { CheckCircle2 } from "lucide-react";
 import usePageTitle from "../hooks/userPageTitle";
 
-const OrderSuccess = () => (
-  usePageTitle("Order Confirmed!");
-  <div className="flex flex-col items-center justify-center min-h-[70vh] text-center px-4">
+const OrderSuccess = () => {
+  usePageTitle("Secure Checkout");
+  return(
+      <div className="flex flex-col items-center justify-center min-h-[70vh] text-center px-4">
     <CheckCircle2 size={60} className="text-green-500 mb-4" />
     <h2 className="text-2xl font-semibold text-gray-700 mb-2">
       Order Placed Successfully!
@@ -19,6 +20,7 @@ const OrderSuccess = () => (
       Continue Shopping
     </Link>
   </div>
-);
+  )
+};
 
 export default OrderSuccess;
