@@ -1,7 +1,9 @@
 import { motion } from "framer-motion";
 import { Users, Award, TrendingUp, Heart } from "lucide-react";
+import usePageTitle from "../hooks/userPageTitle";
 
 const About = () => {
+  usePageTitle("About Us");
   return (
     <div className="bg-gray-50 min-h-screen">
       {/* Hero Section */}

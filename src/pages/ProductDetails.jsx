@@ -14,7 +14,8 @@ import {
 } from "lucide-react";
 import Loader from "../components/loader/Loader";
 import toast from "react-hot-toast";
-import ReviewForm from "../components/ReviewForm"; // <--- Import ReviewForm
+import ReviewForm from "../components/ReviewForm";
+import usePageTitle from "../hooks/userPageTitle";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -25,6 +26,7 @@ const ProductDetails = () => {
   const { singleProduct, loading, error } = useSelector(
     (state) => state.products
   );
+  usePageTitle(singleProduct?.name || "Product Details"); 
   const { user } = useSelector((state) => state.auth);
 
   // Local State for Selection

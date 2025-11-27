@@ -7,8 +7,10 @@ import {
 } from "../features/cart/cartSlice";
 import { Link } from "react-router-dom";
 import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
+import usePageTitle from "../hooks/userPageTitle";
 
 const CartPage = () => {
+  usePageTitle("Your Shopping Cart");
   const { cartItems, totalAmount, totalQuantity } = useSelector(
     (state) => state.cart
   );

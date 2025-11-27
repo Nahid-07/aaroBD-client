@@ -4,8 +4,10 @@ import { fetchMyOrders } from "../features/orders/orderSlice";
 import { User, Package, Clock, MapPin } from "lucide-react";
 import Loader from "../components/loader/Loader";
 import { useNavigate } from "react-router-dom";
+import usePageTitle from "../hooks/userPageTitle";
 
 const ProfilePage = () => {
+  usePageTitle("My Profile & Orders");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);

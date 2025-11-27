@@ -7,8 +7,10 @@ import toast from "react-hot-toast";
 import { Eye, EyeOff, Mail, User } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { ButtonLoader } from "../components/loader/ButtonLoader";
+import usePageTitle from "../hooks/userPageTitle";
 
 const Register = () => {
+  usePageTitle("Create Account");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading } = useSelector((state) => state.auth);

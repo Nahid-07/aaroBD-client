@@ -2,8 +2,10 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, Phone, MapPin, Send, MessageSquare } from "lucide-react";
 import toast from "react-hot-toast";
+import usePageTitle from "../hooks/userPageTitle";
 
 const Contact = () => {
+  usePageTitle('Contact Support')
   const [formData, setFormData] = useState({
     name: "",
     email: "",

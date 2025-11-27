@@ -7,8 +7,10 @@ import toast from "react-hot-toast";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { ButtonLoader } from "../components/loader/ButtonLoader";
 import { GoogleLogin } from "@react-oauth/google";
+import usePageTitle from "../hooks/userPageTitle";
 
 const Login = () => {
+  usePageTitle("Login to Account");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();

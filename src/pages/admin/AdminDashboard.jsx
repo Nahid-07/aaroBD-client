@@ -24,8 +24,10 @@ import {
 } from "lucide-react";
 import Loader from "../../components/loader/Loader";
 import toast from "react-hot-toast";
+import usePageTitle from "../../hooks/userPageTitle";
 
 const AdminDashboard = () => {
+  usePageTitle("Admin Dashboard");
   const dispatch = useDispatch();
 
   // --- UI STATE ---

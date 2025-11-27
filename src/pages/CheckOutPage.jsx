@@ -15,8 +15,10 @@ import {
   ShoppingBag,
   Truck,
 } from "lucide-react";
+import usePageTitle from "../hooks/userPageTitle";
 
 const CheckoutPage = () => {
+  usePageTitle("Secure Checkout");
   const dispatch = useDispatch();
   const navigate = useNavigate();
 

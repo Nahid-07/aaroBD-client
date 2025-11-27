@@ -4,8 +4,10 @@ import { fetchProducts } from "../features/products/ProductSlice";
 import ProductCard from "../components/products/ProductCard";
 import { Search, Filter, X, ChevronLeft, ChevronRight } from "lucide-react";
 import Loader from "../components/loader/Loader";
+import usePageTitle from "../hooks/userPageTitle";
 
 const Shop = () => {
+  usePageTitle("Shop All Products");
   const dispatch = useDispatch();
   // Get pagination data from Redux
   const {
