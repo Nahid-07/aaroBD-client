@@ -83,9 +83,9 @@ const Contact = () => {
             <div>
               <h3 className="font-bold text-gray-800 mb-2">Our Headquarters</h3>
               <p className="text-gray-600 text-sm leading-relaxed">
-                123 Fashion Street, Gulshan Avenue,
+                Pirshaheb Bari, Narinda,
                 <br />
-                Dhaka 1212, Bangladesh.
+                Dhaka 1100, Bangladesh.
               </p>
             </div>
           </div>
@@ -94,7 +94,7 @@ const Contact = () => {
           <div className="h-64 bg-gray-200 rounded-2xl overflow-hidden relative group">
             <iframe
               title="map"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3651.832981752402!2d90.41251841536293!3d23.753331194581235!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755b888ad3b91c5%3A0x13070866a877d94!2sGulshan%2C%20Dhaka!5e0!3m2!1sen!2sbd!4v1646897232345!5m2!1sen!2sbd"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3653.0223752855995!2d90.41742307605041!3d23.71089499029044!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755b900210667d1%3A0x6b83ec3f00b98aff!2sNarinda%20Peer%20Shaheb%20Bari!5e0!3m2!1sen!2sbd!4v1764237521456!5m2!1sen!2sbd"
               width="100%"
               height="100%"
               style={{ border: 0 }}
